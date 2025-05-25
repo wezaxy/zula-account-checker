@@ -38,7 +38,7 @@ Denetleyiciyi kullanmadan önce yapmanız gerekenler:
    - API anahtarınızı kopyalayın
 
 2. RapidAPI anahtarınızla `config.json` dosyasını güncelleyin:
-``json
+```json
 {
  "rapidapi_key": "your-rapidapi-key-here"
 }
@@ -47,7 +47,7 @@ Denetleyiciyi kullanmadan önce yapmanız gerekenler:
 ## 📝 Kullanım
 
 1. Denetleyiciyi çalıştırın:
-``powershell
+```powershell
 python main.py
 ```
 
