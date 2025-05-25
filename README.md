@@ -89,3 +89,6 @@ Sorunları ve geliştirme taleplerini göndermekten çekinmeyin!
 ## ⭐ Destek
 
 Bu aracı faydalı bulursanız, lütfen GitHub'da bir yıldız verin!
+
+
+Discord: wezaxyy
