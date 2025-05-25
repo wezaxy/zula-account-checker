@@ -58,7 +58,7 @@ python main.py
 ## 💎 Açıklanan Özellikler
 
 - **Asenkron İşleme**: Birden fazla hesabı aynı anda kontrol eder
-- - **Proxy Desteği**: Kontrol için HTTP/HTTPS proxy'leri kullanın
+- **Proxy Desteği**: Kontrol için HTTP/HTTPS proxy'leri kullanın
 - **Canlı Sonuçlar**: Başarılı girişleri anında görün
 - **İstatistikler**: Kontrol ilerlemenizi takip edin
 - Temiz kullanıcı arayüzü**: Modern ve sezgisel arayüz
