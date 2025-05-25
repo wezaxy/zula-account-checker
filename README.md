@@ -33,7 +33,7 @@ Bu denetleyiciyi kullanmak için bir Turnike Bypass API anahtarına ihtiyacını
 Denetleyiciyi kullanmadan önce yapmanız gerekenler:
 
 1. Turnike baypası için RapidAPI anahtarınızı alın:
-   - RapidAPI üzerinde Turnike Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1) adresini ziyaret edin
+   - RapidAPI üzerinde [Turnike Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1) adresini ziyaret edin
    - API anahtarınızı almak için abone olun
    - API anahtarınızı kopyalayın
 
