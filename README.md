@@ -61,7 +61,7 @@ python main.py
 - **Proxy Desteği**: Kontrol için HTTP/HTTPS proxy'leri kullanın
 - **Canlı Sonuçlar**: Başarılı girişleri anında görün
 - **İstatistikler**: Kontrol ilerlemenizi takip edin
-- Temiz kullanıcı arayüzü**: Modern ve sezgisel arayüz
+- **Temiz kullanıcı arayüzü**: Modern ve sezgisel arayüz
 
 ## ⚠️ Önemli Notlar
 
