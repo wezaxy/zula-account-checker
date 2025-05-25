@@ -4,7 +4,7 @@ Python ve PyQt5 ile oluşturulmuş güzel bir GUI arayüzüne sahip Zula hesapla
 
 ## 🔑 API Anahtar Bilgileri
 
-Bu denetleyiciyi kullanmak için bir Turnike Bypass API anahtarına ihtiyacınız olacak:
+Bu denetleyiciyi kullanmak için bir Turnstile Bypass API anahtarına ihtiyacınız olacak:
 
 - ✨ Ücretsiz Deneme Mevcuttur: 35 talep/ay
 - 🚀 Ziyaret [Turnstile Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1)
@@ -19,7 +19,7 @@ Bu denetleyiciyi kullanmak için bir Turnike Bypass API anahtarına ihtiyacını
 - 🎨 Koyu tema ile güzel tasarım
 - 📊 Gerçek zamanlı istatistikler
 - 💎 Başarılı girişler için ayrı ekran
-- 🔒 Cloudflare Turnike bypass desteği
+- 🔒 Cloudflare Turnstile bypass desteği
 ## 🚀 Gereksinimler
 
 - Python 3.7+
@@ -32,7 +32,7 @@ Bu denetleyiciyi kullanmak için bir Turnike Bypass API anahtarına ihtiyacını
 
 Denetleyiciyi kullanmadan önce yapmanız gerekenler:
 
-1. Turnike baypası için RapidAPI anahtarınızı alın:
+1. Turnstile baypası için RapidAPI anahtarınızı alın:
    - RapidAPI üzerinde [Turnstile Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1) adresini ziyaret edin
    - API anahtarınızı almak için abone olun
    - API anahtarınızı kopyalayın
@@ -67,7 +67,7 @@ python main.py
 
 - Combo dosyanızın doğru formatta olduğundan emin olun (kullanıcı adı:şifre)
 - Proxy'lerinizin çalıştığından ve doğru formatta olduğundan emin olun
-- Turnike baypasının çalışması için geçerli bir RapidAPI anahtarına sahip olmanız gerekir
+- Turnstile baypasının çalışması için geçerli bir RapidAPI anahtarına sahip olmanız gerekir
 - Bu araç sadece eğitim amaçlıdır
 
 ## 🔑 API Anahtarı Alma
