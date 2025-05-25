@@ -7,7 +7,8 @@ Python ve PyQt5 ile oluşturulmuş güzel bir GUI arayüzüne sahip Zula hesapla
 Bu denetleyiciyi kullanmak için bir Turnike Bypass API anahtarına ihtiyacınız olacak:
 
 - ✨ Ücretsiz Deneme Mevcuttur: 35 talep/ay
-- 🚀 Ziyaret [Turnike Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1)
+- 🚀 Ziyaret [Turnstile Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1)
+
 - 💫 Yükseltmeden önce test etmek için mükemmel
 
 ## ✨ Özellikler
