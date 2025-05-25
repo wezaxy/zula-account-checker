@@ -72,7 +72,7 @@ python main.py
 
 ## 🔑 API Anahtarı Alma
 
-1. Turnike Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1) adresini ziyaret edin
+1. [Turnstile Bypass API](https://rapidapi.com/ttur5678/api/turnstile-bypass-api1) adresini ziyaret edin
 2. Henüz yapmadıysanız RapidAPI'ye kaydolun
 3. API'ye abone olun (çeşitli fiyatlandırma planları mevcuttur)
 4. Kontrol panelinden API anahtarınızı alın
