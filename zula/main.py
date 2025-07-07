@@ -10,7 +10,7 @@ from colorama import Fore, init
 init(autoreset=True)
 
 rapidheaders = {
-    "x-rapidapi-key": "b3f02869f5msh6078c451466020ap10973bjsncabd03b0d35f",
+    "x-rapidapi-key": "YOUR_API_KEY",
     "x-rapidapi-host": "turnstile-bypass-api1.p.rapidapi.com",
     "Content-Type": "application/json",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
