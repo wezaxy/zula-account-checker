@@ -7,7 +7,6 @@ def install_requirements():
     
     requirements = [
         'aiohttp',
-        'PyQt5',
         'colorama'
     ]
     
