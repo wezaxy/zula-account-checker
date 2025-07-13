@@ -92,3 +92,8 @@ Bu aracı faydalı bulursanız, lütfen GitHub'da bir yıldız verin!
 
 
 Discord: wezaxy
+Copyright (c) 2025 wezaxy
+All rights reserved.
+
+Bu yazılımın herhangi bir şekilde izinsiz kopyalanması, dağıtılması ve değiştirilmesi yasaktır.
+
