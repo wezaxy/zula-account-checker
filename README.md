@@ -92,5 +92,5 @@ Bu aracı faydalı bulursanız, lütfen GitHub'da bir yıldız verin!
 
 
 Discord: wezaxy
-
+https://discord.gg/c44FB4PFcW
 
